@@ -1,85 +1,262 @@
 #include <iostream>
+#include <stdlib.h>
 using namespace std;
-typedef struct  Node{
+
+typedef struct node {
+    int info;
+    struct node *link;
+} node;
+
+node* insert(node *start) {
     int data;
-    Node*link;
-}Node;
-Node * insert(Node* start){
-    int data;
-    cout<<"enter the number you want to enter"<<endl;
+    cout<<"Enter the data: ";
     cin>>data;
-    Node *ptr=(Node*)malloc(sizeof(Node));
-    if(ptr==NULL){
-        cout<<"memory allocation failed"<<endl;
+    node* ptr = new node ;
+    if (ptr == NULL) {
+        cout<<"allocation failed.\n";
         return start;
     }
-    ptr->data=data;
-    ptr->link=start;
-    start=ptr;
+
+    ptr->info = data;
+    ptr->link = start;
+    start = ptr;
+
     return start;
 }
-void Display(Node* start){
-    Node* ptr=start;
-    while(ptr!=NULL){
-        cout<<ptr->data<<"->";
-        ptr=ptr->link;
-    }
-    cout<<"NULL"<<endl;
-}
-void count(Node* start){
-    Node* ptr=start;
-    int i=0;
-    while(ptr!=NULL){
-        i++;
-        ptr=ptr->link;
-    }
-    cout<<"Number of the Nodes are :"<<i<<endl;
-    cout<<endl;
-}
-void search(Node* start){
-    Node* ptr=start;
-    int target,i=1;
+
+void search(node *start){
+    int target;
+    cout<<"Enter the number you want to search in the linked list:"<<endl;
     cin>>target;
-    while(ptr!=NULL){
-        if(target==ptr->data){
-            cout<<"target found at node "<<i <<endl;
+    node *ptr = start;
+    while (ptr != NULL) {
+        if(ptr->info == target){
+            cout<<"Found %d in the list.\n"<<target;
             return;
         }
-        else{
-            i++;
-        ptr=ptr->link;}
+        ptr = ptr->link;
     }
-    
+    cout<< target<<"not found in the list.\n";
 }
-void greatest(Node* start){
-    Node* ptr=start;
-    int max=ptr->data;
-    while(ptr!=NULL){
-        if(max<ptr->data){
-            max=ptr->data;
+
+void display(node *start) {
+    node *ptr = start;
+    if (ptr == NULL) {
+        cout<<"List is empty."<<endl;
+        return;
+    }
+    while (ptr != NULL) {
+        cout<<ptr->info<<" ";
+        ptr = ptr->link;
+    }
+    cout<<"\n";
+}
+void greatest(node *start) {
+    if (start == NULL) {
+        cout<<"List is empty.\n";
+        return;
+    }
+
+    node *ptr = start;
+    int max = ptr->info;
+    while (ptr != NULL) {
+        if (max < ptr->info) {
+            max = ptr->info;
         }
-        ptr=ptr->link;
+        ptr = ptr->link;
     }
-    cout<<"greates numbers are "<<max<<endl;
+    cout<<"The greatest number in the linked list is "<<max;
 }
- int main(){
-     Node* start=NULL;
-     int choice;
+
+void count(node *start){
+    node *ptr = start;
+    int i = 0;
+    while (ptr != NULL) {
+        i++;
+        ptr = ptr->link;
+    }
+    cout<<"There are "<< i <<" nodes in the list.\n";
+}
+
+node* firstdeletion(node *start) {
+    if (start == NULL) {
+        cout<<"List is empty, nothing to delete.\n";
+        return start;
+    }
+
+    node *ptr = start;
+    start = start->link;
+    free(ptr);
+
+    cout<<"First node is deleted.\n";
+    return start; 
+}
+
+node* lastdeletion(node *start) {
+    if (start == NULL) {
+        cout<<"List is empty, nothing to delete.\n";
+        return start;
+    }
+
+    node *ptr = start;
+    node *preptr = NULL;
+    while (ptr->link != NULL) {
+        preptr = ptr;
+        ptr = ptr->link;
+    }
+    if (preptr != NULL) {
+        preptr->link = NULL;
+    } else {
+        start = NULL;
+    }
+    free(ptr);
+    cout<<"Last node is deleted."<<endl;
+    return start; 
+}
+
+node* selecteddeletion(node *start, int tar) {
+    if (start == NULL) {
+        cout<<"List is empty, nothing to delete.\n";
+        return start;
+    }
+
+    node *ptr = start;
+    node *preptr = NULL;
+    if (ptr != NULL && ptr->info == tar) {
+        start = ptr->link;
+        free(ptr);
+        cout<<tar<<" data node is deleted."<<endl;
+        return start;
+    }
+
+    while (ptr != NULL && ptr->info != tar) {
+        preptr = ptr;
+        ptr = ptr->link;
+    }
+
+    if (ptr == NULL) {
+        cout<<tar<<"not found in the list.\n";
+        return start;
+    }
+
+    preptr->link = ptr->link;
+    free(ptr);
+    cout<<tar<<" data node is deleted.\n";
+    return start;
+}
+node* merge(node *start, node *start2) {
+    if (start == NULL) {
+        return start2;
+    }
+    node *ptr = start;
+    while (ptr->link != NULL) {
+        ptr = ptr->link;
+    }
+    ptr->link = start2;
+    cout<<"Lists merged.\n";
+    return start;
+}
+
+node* rev(node *start) {
+    node *current = start;
+    node *previous = NULL;
+    node *next = NULL;
+
+    while (current != NULL) {
+        next = current->link;
+        current->link = previous;
+        previous = current;
+        current = next;
+    }
+
+    start = previous;
+    return start;
+}
+node* sorting(node* start) {
+    if (start == NULL || start->link == NULL) {
+        return start;
+    }
+
+    node *ptr;
+    int swapped;
+
+    do {
+        swapped = 0;
+        ptr = start;
+
+        while (ptr->link != NULL) {
+            if (ptr->info > ptr->link->info) {
+                int temp = ptr->info;
+                ptr->info = ptr->link->info;
+                ptr->link->info = temp;
+                swapped = 1;
+            }
+            ptr = ptr->link;
+        }
+    } while (swapped);
+
+    return start;
+}
+
+int main() {
+    node *start = NULL;
+    node *start2 = NULL;
+    int chose;
 
     while (1) {
-        printf("\nEnter what you want to do with the linked list:\n");
-        printf("1. Insert\n2. Display\n3. Exit\n4. Search\n5. Node Count\n6. Greatest in Linked List\n");
-        printf("Your choice: ");
-        scanf("%d", &choice);
-        
-        switch (choice) {
-            case 1: start = insert(start); break;
-            case 2: Display(start); break;
-            case 4: search(start); break;
-            case 5: count(start); break;
-            case 6: greatest(start); break;
-            case 3: exit(0); break;
-            default: printf("Invalid choice. Please try again.\n"); break;
-        }}
-     return 0;
- }
+        cout<<"Enter what you want to do with the linked list:\n0. Exit\n";
+        cout<<"1. Insert\n2. Display\n3. Search\n4. Nodes count\n5. Greatest in list\n6. First del\n7. Last del\n8. Selected del\n9. Merge\n10. Reverse \n11.sorting\n";
+        cin>>chose;
+
+        switch (chose) {
+            case 1: 
+                start = insert(start);
+                cout<<"For second linked list:\n";
+                start2 = insert(start2);
+                break;
+            case 2: 
+                display(start); 
+                break;
+            case 3: 
+                search(start); 
+                break;
+            case 4:
+                count(start); 
+                break;
+            case 5:
+                greatest(start); 
+                break;
+            case 6: 
+                start = firstdeletion(start); 
+                break;
+            case 7: 
+                start = lastdeletion(start); 
+                break;
+            case 8: 
+                {
+                    int tar;
+                    cout<<"Enter the value to delete: ";
+                    cin>>tar;
+                    start = selecteddeletion(start, tar);
+                }
+                break; 
+            case 9:
+                start = merge(start, start2); 
+                break;
+            case 10: 
+                start = rev(start); 
+                break;
+            case 11:
+                start= sorting(start);
+                break;
+            case 0: 
+                exit(0); 
+                break;
+            default: 
+                cout<<"Invalid choice\n"; 
+                break;
+        }
+    }
+
+    return 0;
+}
